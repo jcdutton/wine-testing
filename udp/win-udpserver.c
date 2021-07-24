@@ -170,21 +170,20 @@ int main() {
 				printf("%d:revents=%d\n", n, poll_set[n].revents);
 				if (poll_set[n].revents != 0) {
 					int tmp = recvfrom(poll_set[n].fd, (char *)buffer, MAXLINE,
-								MSG_WAITALL, ( struct sockaddr *) &cliaddr,
+								0, ( struct sockaddr *) &cliaddr,
 								&len);
+					printf("recvfrom result:0x%x\n", tmp);
 					buffer[tmp] = '\0'; // FIXME: buffer overflow risk
-					printf("From Server: recvfrom socket offset %d, IP address %d.%d.%d.%d, Port %d,  Client : %s\n",
+					char *str2 = inet_ntoa(cliaddr.sin_addr);
+					printf("From Server: recvfrom socket offset %d, IP address %s, Port %d,  Client : %s\n",
 							n,
-							cliaddr.sin_addr.S_un.S_un_b.s_b1,
-							cliaddr.sin_addr.S_un.S_un_b.s_b2,
-							cliaddr.sin_addr.S_un.S_un_b.s_b3,
-							cliaddr.sin_addr.S_un.S_un_b.s_b4,
+							str2,
 							cliaddr.sin_port,
 							buffer);
-					printf("Note: wine on Linux returns offset 1,  The same .exe run in windows returns offset 0\n");
-					printf("      This causes problems with some windows networking programs running on wine.\n");
 				}
 			}
+			printf("Note: wine on Linux returns offset 1,  The same .exe run in windows returns offset 0\n");
+			printf("      This causes problems with some windows networking programs running on wine.\n");
 		}
 	}
 

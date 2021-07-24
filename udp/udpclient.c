@@ -11,12 +11,18 @@
 #define PORT	 8080
 #define MAXLINE 1024
 
-int main() {
+int main(int argc, char **argv) {
 	int sockfd;
 	char buffer[MAXLINE];
 	char *hello = "Hello from client";
 	struct sockaddr_in	 servaddr;
 
+	if (argc != 2) {
+		printf("Usage:  udpclient ip-address\n");
+		exit(1);
+	}
+	char *str1 = argv[1];
+	printf("arg: %s\n", str1);
 	// Creating socket file descriptor
 	if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
 		perror("socket creation failed");
@@ -28,7 +34,8 @@ int main() {
 	// Filling server information
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_port = htons(PORT);
-	servaddr.sin_addr.s_addr = INADDR_ANY;
+	//servaddr.sin_addr.s_addr = INADDR_ANY;
+	inet_pton(AF_INET, str1, &(servaddr.sin_addr));
 	
 	int n, len;
 	
