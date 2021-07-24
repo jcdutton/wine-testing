@@ -1,0 +1,41 @@
+Wine-testing
+
+This repo contains various test programs that highlight shortcommings in Wine.
+
+Example 1: UDP receiving and SO_REUSERADDR.
+
+The use case I am struggling with is the use of a Windows program
+running in wine that is sending and receiving UDP packets.
+This particular windows program uses SO_REUSEADDR socket option and
+opens two sockets. Lets call the first one socket A, and the second
+one Socket B.
+
+The SO_REUSEADDR from the Windows application is translated by "wine" into a
+SO_REUSEADDR in Linux.
+Unfortunately the behaviour of these is different between Windows and
+Linux so the Windows application fails to run on Linux under wine.
+1 ) On windows:
+All received unicast UDP packets will arrive on the first opened
+socket. Thus on socket A.
+2) On Linux:
+All received unicast UDP packets will arrive on the last opened
+socket. Thus on socket B.
+
+The problem is that this windows program only expects to receive
+unicast UDP packets on socket A, and thus it sees no packets.
+
+There are no currently existing socket options in Linux that would
+permit wine to simulate the Windows behaviour.
+And thus, the reason I am asking the question here.
+Please can we add an extra socket option to the Linux socket options
+such that we can get wine to simulate Windows correctly. I.e. behave
+like (1) above.
+Now wine is pretty good at simulating most things Windows throws at
+it, but socket options is not one of them yet.
+Also note, that (1) is actually more secure than (2) because it
+prevents other applications with the same UserID from hijacking the
+socket.
+Although (2) is more helpful in more gracefully handling some error edge cases.
+
+Suggested new option name:  SO_REUSEADDR_WS
+
